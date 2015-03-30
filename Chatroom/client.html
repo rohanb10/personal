@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="generator" content="HTML Tidy for Linux/x86 (vers 25 March 2009), see www.w3.org" />
+    <title>
+        Chat
+    </title>
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <meta http-equiv="content-type|default-style|refresh" />
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+     var socketio = io.connect();
+     
+     var name;
+     if (document.getElementById('name') != null) {
+        name = document.getElementById("name").value;
+     }
+     else {
+        name = "";
+     }
+     
+     function sendMessage(){
+        var msg = document.getElementById("message_input").value;
+        socketio.emit("message_to_server", {message:msg, from: name});
+        document.getElementById("message_input").value="";
+     }
+     
+     socketio.on("message_to_client",function(data) {
+        document.getElementById("message_input").innerHTML="";
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createTextNode(data["from"]+ " :  "+data['message']));
+     });
+     
+     function addName() {
+        name = document.getElementById("name").value;
+        socketio.emit("add_new_user", {clientname:name});
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createTextNode(name + " has joined Default"));
+        document.getElementById("form").innerHTML=("Hello "+name);
+     }
+     
+     socketio.on("add_name",function(data) {
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createTextNode(data["from"] + " has joined " + data["room"]));
+     });
+     
+     socketio.on("leave",function(data) {
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createTextNode(data["from"] + " has left " + data["room"]));
+     });
+
+     function createNewRoom() {
+       var id = document.getElementById("room_value").value;
+        
+       if (id=='') {
+        alert("Please enter a room name.")
+       }
+       else{
+        var password = '';
+        if (document.getElementById("password").checked) {
+           while (password=='') {
+              password = prompt("Enter room password");
+           }
+        }
+        socketio.emit("create_room", {room:id, password: password});
+       }
+     }
+     
+     socketio.on("new_room_created",function(data) {
+        //Append an HR thematic break and the escaped HTML of the new message
+        //var x = [];
+        //x = data['roomarray'];
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createTextNode(data['roomname']));
+        document.getElementById("room_value").innerHTML="";
+        document.getElementById("room_value").checked=false;
+     });
+     
+     socketio.on("update_room", function(data){
+        document.getElementById("rooms").innerHTML="";
+        var rooms = data["roomlist"];
+        for(x in rooms){
+           if (rooms[x] == data["current"]) {
+              document.getElementById("rooms").appendChild(document.createElement('div'));
+              document.getElementById("rooms").appendChild(document.createTextNode(rooms[x]));
+           }
+           else{
+              $('#rooms').append('<div><a href="#" onclick="checkPW(\''+rooms[x]+'\')">' + rooms[x] + '<\/a><\/div>');
+           }
+        }
+        
+     });
+
+     socketio.on("pwCheck",function(data){ //prompts for the password, if it exists
+        if(data["ans"]){
+            var pwAttempt= prompt("Please enter the password for this room:");
+            socketio.emit("Validpw",{room: data["room"], pw: pwAttempt});
+        }
+        else{
+            socketio.emit("switch_room", {room: data["room"]});
+        }
+     });
+
+     socketio.on("pwAttempt",function(data){ //checks if the password is correct
+        if(data["ans"]){
+            socketio.emit("switch_room", {room: data["room"]});
+        }
+        else{
+            alert("Incorrect password. Please try again");
+        }
+     });
+
+     function checkPW(data){ //checks if there is a password
+        socketio.emit("hasPW",{room:data});
+     }
+     
+     // function switchRoom(data) {  //Switch to this and comment out above if it breaks
+     //    socketio.emit("switch_room", {room: data});
+     // }
+
+     function privateMsg() {
+        var user= prompt("Who would you like to send this message to?");
+        if(user!=''){
+        	var msg= prompt("What would you like to send "+user+" ?");
+        	if(msg!=''){
+        		socketio.emit("privateMsg", {rc: user, sn: name, msg: msg});
+        	}
+        	else{
+        		alert("Message field cannot be blank");
+        	}
+        }
+        else{
+        	alert("User field cannot be blank");
+        }
+
+     }
+
+     socketio.on("incomingPvtMsg", function(data){
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createElement("strong")).appendChild(document.createTextNode("Private message from "+data["from"]+" : "+data["msg"]));
+        //document.getElementById("chatlog");
+     });
+
+     socketio.on("outgoingPvtMsg", function(data){
+        document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createElement("strong")).appendChild(document.createTextNode("Private message to "+data["to"]+" : "+data["msg"]));
+        //document.getElementById("chatlog");
+     });
+
+    function checkOwner() {
+        socketio.emit("checkChatOwner");
+    }
+
+    socketio.on("ownsIt", function(data){
+        if(data["ans"]){
+            var userTK= prompt("Who would you like to kick?");
+            if(userTK!=''){
+            	socketio.emit("kickUser",{ user: userTK});
+            }
+            else{
+            	alert("User field cannot be blank");
+            }
+        }
+        else{
+            alert("You do not have the right to kick anyone from this chat.");
+        }
+    });
+
+    socketio.on("kick_message_out", function(data){
+    	socketio.emit("kick_me_out", {room: data["room"]});
+    	document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createElement("strong")).appendChild(document.createTextNode("You have been kicked out of the room"));
+    });
+
+    socketio.on("kick_message_in", function(data){
+    	document.getElementById("chatlog").appendChild(document.createElement("hr"));
+        document.getElementById("chatlog").appendChild(document.createElement("strong")).appendChild(document.createTextNode("You have kicked " + data["user"] + " from the room."));
+    });
+    </script>
+</head>
+<body>
+    <h1 >
+        Welcome to 330 Chat Messenger
+    </h1>
+    <div id="form">
+        <h3 class="title">What's your name?</h3>
+        <input class="usernameInput" id="name" type="text" maxlength="14" />
+        <button onclick="addName()">Join</button>
+    </div>
+    <input type="text" id="room_value" /> 
+    <button onclick="createNewRoom()">New Chat Room</button>
+    <input type="checkbox" id="password" />Password protected?
+    <div style="float:right;width:100px;border-left:1px solid black;height:300px;padding:10px;">
+        <b>ROOMS</b>
+        <div id="rooms"></div>
+    </div>
+    <button onclick="privateMsg()">Send a Private Message</button>
+    <button onclick="checkOwner()">Kick a User</button>
+    <div id="chatlog"></div>
+    <div style="position:fixed;padding: 3px;bottom:100px;"><input style="width:300px;" type="text" id="message_input" /> <button onclick="sendMessage()">Send</button></div>
+</body>
+</html>
