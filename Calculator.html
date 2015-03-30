@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Calculator</title>
+	<link rel="stylesheet" type="text/css" href="CalcStyle.css">
+	<script type="text/javascript">
+		function calc(){
+			var radios = document.forms["calc"].elements["op"];
+			for(var i = 0; i < radios.length; i++) {
+				if (radios[i].checked) { 
+					var operator  =  radios[i].value;
+	    		}
+			}
+			var num1=document.getElementById("f1").value;
+			var num2=document.getElementById("f2").value;
+			var sol= 0;
+			if(operator=="add"){
+				sol=((10000000*parseFloat(num1))+(10000000*parseFloat(num2)))/10000000;
+			}
+			if(operator=="sub"){
+				sol=((10000000*parseFloat(num1))-(10000000*parseFloat(num2)))/10000000;
+			}
+			if(operator=="mult"){
+				sol=((10000000*parseFloat(num1))*(10000000*parseFloat(num2)))/10000000/10000000;
+			}
+			if(operator=="div"){
+				if(num2==0){
+					sol= "Does not exist";
+				}
+				else{
+					sol=parseFloat(num1)/parseFloat(num2);
+				}
+			}
+			document.getElementById("solution").value = sol;
+		}
+	</script>
+</head>
+<body>
+	<div id="title"><p>Calculator</p></div>
+	<form name="calc" method="POST"><div class="break">
+		<input type="text" value="0" id="f1">
+		<input type="text" value="0" id="f2"></div><div class="break">
+		<input type="radio" id="a" name="op" value="add" checked>+
+		<input type="radio" id="s" name="op" value="sub">-
+		<input type="radio" id="m" name="op" value="mult">x
+		<input type="radio" id="d" name="op" value="div">/<br>
+		<input type="text" id="solution" name="solution" value="0" readonly></div>
+	</form>
+	<script>
+		document.getElementById("f1").addEventListener("input",calc, false);
+		document.getElementById("f2").addEventListener("input",calc, false);
+		document.getElementById("a").addEventListener("click",calc, false);
+		document.getElementById("s").addEventListener("click",calc, false);
+		document.getElementById("m").addEventListener("click",calc, false);
+		document.getElementById("d").addEventListener("click",calc, false);
+	</script>
+</body>
+</html>
