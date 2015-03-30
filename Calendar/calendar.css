@@ -1,0 +1,35 @@
+#loginPopup {
+	display:none; 
+}
+#editEventPopup {
+	display:none;
+}
+#newEventPopup {
+	display: none;
+}
+#newUserPopup {
+	display: none;
+}
+#goToPopup {
+	display: none;
+}
+body {
+	font: 20px Verdana black;
+}
+table {
+	border: 2px solid black;
+	border-collapse: collapse;
+	table-layout: fixed;
+	font: 25px Verdana black;
+	text-align: left;
+	vertical-align: top;
+}
+table, td, th {
+	width: 95%;
+	height: 60px;
+	font: 20px Verdana black;
+}
+td, th {
+	padding: 5px;
+	font: 20px Verdana black;
+}
