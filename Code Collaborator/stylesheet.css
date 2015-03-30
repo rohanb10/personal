@@ -1,0 +1,45 @@
+body{
+	background-color: #33AD33;
+}
+#chatbar {
+    top: 5px;
+    font-family: Helvetica;
+    float: right;
+    width: 400px;
+    height: 764px;
+    border-left: 2px solid black;
+    padding-left: 5px;
+    padding-right: 10px;
+}
+#Projects {
+    top: 5px;
+    float: right;
+    width: 150px;
+    height: 764px;
+    border-left: 2px solid black;
+    padding-left: 5px;
+    padding-right: 10px;
+}
+#newFile {
+    margin-left: 23px;
+    margin-top: 720px;
+    float: bottom;
+}
+#newFilePopup {
+    display: none;
+}
+#chatbuttons, #projectButtons {
+    bottom: 20px;
+    position: fixed;
+}
+#bottomstuff {
+    left:30px;
+    bottom: 50px;
+    position: fixed;
+}
+#firepad-container {
+    position: absolute;
+    background-color: #33AD33;
+    width: 58%;
+    height: 75%;
+}
