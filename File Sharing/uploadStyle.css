@@ -1,0 +1,25 @@
+body{
+    text-align: center;
+    background-color: #FF7373;
+    margin: 10px;
+    font: 30px Verdana;
+    color: white;
+}
+input[type="submit"],input[type="file"]{
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid white;
+    -webkit-border: 1px solid white;
+    color: white;
+    background-color: #ff5f5f;
+    font: 15px Verdana;
+    margin: 15px;
+    width: 150px;
+    line-height: 27px;
+}
+
+input[type="file"] {
+    width: auto;
+    line-height: 15px;
+    border: none;
+}
